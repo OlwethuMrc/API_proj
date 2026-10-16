@@ -5,8 +5,7 @@ namespace API_proj.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class User : ControllerBase
+    public class ResultController : ControllerBase
     {
-
     }
 }

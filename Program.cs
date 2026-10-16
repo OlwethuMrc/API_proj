@@ -1,4 +1,5 @@
 using API_proj.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -36,3 +37,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

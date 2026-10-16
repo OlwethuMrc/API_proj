@@ -5,7 +5,8 @@ namespace API_proj.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Event : ControllerBase
+    public class EventController : ControllerBase
     {
+
     }
 }

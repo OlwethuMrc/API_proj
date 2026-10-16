@@ -5,9 +5,9 @@ namespace API_proj.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Category : ControllerBase
+    public class CategoryController: ControllerBase
     {
-        public Category() 
+        public CategoryController() 
         {
             
         }
