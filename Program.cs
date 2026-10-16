@@ -38,3 +38,10 @@ app.MapControllers();
 
 app.Run();
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "RaceDayAuth";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.LoginPath = "/api/auth/login";
+    });
