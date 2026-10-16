@@ -22,6 +22,8 @@ namespace API_proj.Data
 
         //DbSet<T> property here for each model,
         //e.g public DbSet<User> Users { get; set; }
+
+       
     }
 }
      

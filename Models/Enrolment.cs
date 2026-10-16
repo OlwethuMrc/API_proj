@@ -5,7 +5,9 @@ namespace API_proj.Models
 {
     public class Enrolment
     {
+        [Key] 
         public int EnrollmentId { get; set; }
+
 
 
         public int EventId { get; set; }
