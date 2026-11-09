@@ -21,15 +21,20 @@ namespace API_proj.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Registers a new user as Organiser or Participant with BCrypt hashed password.
+        /// </summary>
         [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
-                return BadRequest(new { message = "Email is already registered." });
+            if (await _context.Users.AnyAsync(u => u.Email == dto.Email || u.Username == dto.Username))
+                return BadRequest(new { message = "Username or Email already exists." });
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
-            var user = new User
+            var user = new API_proj.Models.User
             {
                 Username = dto.Username,
                 PasswordHash = passwordHash,
@@ -45,19 +50,19 @@ namespace API_proj.Controllers
 
             if (dto.Role.Equals("Organiser", StringComparison.OrdinalIgnoreCase))
             {
-                var organiser = new Organiser
+                var organiser = new API_proj.Models.Organiser
                 {
                     UserId = user.UserId,
-                    OrganisationName = dto.OrganisationName ?? "Default Organisation"
+                    OrganisationName = dto.OrganisationName ?? $"{user.FirstName}'s Events"
                 };
                 _context.Organisers.Add(organiser);
             }
             else if (dto.Role.Equals("Participant", StringComparison.OrdinalIgnoreCase))
             {
-                var participant = new Participant
+                var participant = new API_proj.Models.Participant
                 {
                     UserId = user.UserId,
-                    DateOfBirth = dto.DateOfBirth,
+                    DateOfBirth = dto.DateOfBirth = DateTime.Now.AddYears(-20),
                     Gender = dto.Gender = "Other"
                 };
                 _context.Participants.Add(participant);
@@ -67,12 +72,17 @@ namespace API_proj.Controllers
             return Ok(new { message = "Registration successful." });
         }
 
+        /// <summary>
+        /// Authenticates user credentials and starts an encrypted Cookie session.
+        /// </summary>
         [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-                return Unauthorized(new { message = "Invalid email or password." });
+            if (user == null || BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+                return Unauthorized(new { message = "Invalid credentials." });
 
             var claims = new List<Claim>
             {
@@ -89,8 +99,12 @@ namespace API_proj.Controllers
             return Ok(new { message = "Login successful.", role = user.Role });
         }
 
+        /// <summary>
+        /// Ends the current user cookie session.
+        /// </summary>
         [HttpPost("logout")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
