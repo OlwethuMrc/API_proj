@@ -40,7 +40,7 @@ namespace API_proj.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("API_proj.Models.Enrolment", b =>
@@ -70,7 +70,7 @@ namespace API_proj.Migrations
 
                     b.HasIndex("ParticipantId");
 
-                    b.ToTable("Enrolments", (string)null);
+                    b.ToTable("Enrolments");
                 });
 
             modelBuilder.Entity("API_proj.Models.Event", b =>
@@ -117,7 +117,7 @@ namespace API_proj.Migrations
 
                     b.HasIndex("OrganiserId");
 
-                    b.ToTable("Events", (string)null);
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("API_proj.Models.Organiser", b =>
@@ -142,7 +142,7 @@ namespace API_proj.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Organisers", (string)null);
+                    b.ToTable("Organisers");
                 });
 
             modelBuilder.Entity("API_proj.Models.Participant", b =>
@@ -170,7 +170,7 @@ namespace API_proj.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Participants", (string)null);
+                    b.ToTable("Participants");
                 });
 
             modelBuilder.Entity("API_proj.Models.Result", b =>
@@ -202,7 +202,7 @@ namespace API_proj.Migrations
 
                     b.HasIndex("ParticipantId");
 
-                    b.ToTable("Results", (string)null);
+                    b.ToTable("Results");
                 });
 
             modelBuilder.Entity("API_proj.Models.User", b =>
@@ -246,7 +246,7 @@ namespace API_proj.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("API_proj.Models.Enrolment", b =>
