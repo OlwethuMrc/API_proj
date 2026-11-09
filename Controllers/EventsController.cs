@@ -18,7 +18,9 @@ namespace API_proj.Controllers
             _context = context;
         }
 
-        // GET: api/Events (Open to all roles)
+        /// <summary>
+        /// Returns all events (Open to Organisers and Participants).
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<API_proj.Models.Event>>> GetEvents()
         {
@@ -28,7 +30,9 @@ namespace API_proj.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Events/5
+        /// <summary>
+        /// Returns an event by ID.
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<API_proj.Models.Event>> GetEvent(int id)
         {
@@ -41,40 +45,37 @@ namespace API_proj.Controllers
             return raceEvent;
         }
 
-        // POST: api/Events (Organiser Only)
+        /// <summary>
+        /// Creates a new race event (Organiser Role Only).
+        /// </summary>
         [HttpPost]
         [Authorize(Roles = "Organiser")]
         public async Task<ActionResult<API_proj.Models.Event>> PostEvent([FromBody] API_proj.Models.Event raceEvent)
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (int.TryParse(userIdString, out int userId))
-            {
-                var organiser = await _context.Organisers.FirstOrDefaultAsync(o => o.UserId == userId);
-                if (organiser == null) return Unauthorized(new { message = "Organiser profile not found." });
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var organiser = await _context.Organisers.FirstOrDefaultAsync(o => o.UserId == userId);
 
-                // Fixed: matches OrganizerId with 'z' from Event.cs model
-                raceEvent.OrganizerId = organiser.OrganiserId;
-            }
+            if (organiser == null) return Unauthorized(new { message = "Organiser account not found." });
 
+            raceEvent.OrganizerId = organiser.OrganiserId;
             _context.Events.Add(raceEvent);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetEvent), new { id = raceEvent.EventId }, raceEvent);
         }
 
-        // PUT: api/Events/5 (Organiser Owner Only)
+        /// <summary>
+        /// Updates an existing event (Organiser Owner Only).
+        /// </summary>
         [HttpPut("{id}")]
         [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> PutEvent(int id, [FromBody] API_proj.Models.Event raceEvent)
         {
             if (id != raceEvent.EventId) return BadRequest();
 
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
-
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var organiser = await _context.Organisers.FirstOrDefaultAsync(o => o.UserId == userId);
 
-            // Fixed: matches OrganizerId with 'z'
             if (organiser == null || raceEvent.OrganizerId != organiser.OrganiserId)
                 return Forbid();
 
@@ -84,7 +85,9 @@ namespace API_proj.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Events/5 (Organiser Owner Only)
+        /// <summary>
+        /// Deletes an event (Organiser Owner Only).
+        /// </summary>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> DeleteEvent(int id)
@@ -92,12 +95,9 @@ namespace API_proj.Controllers
             var raceEvent = await _context.Events.FindAsync(id);
             if (raceEvent == null) return NotFound();
 
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
-
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var organiser = await _context.Organisers.FirstOrDefaultAsync(o => o.UserId == userId);
 
-            // Fixed: matches OrganizerId with 'z'
             if (organiser == null || raceEvent.OrganizerId != organiser.OrganiserId)
                 return Forbid();
 
